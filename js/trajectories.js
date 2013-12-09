@@ -17,7 +17,7 @@ $(document).ready(function() {
 	$("#rawbutton").click(function () {
 		$("#rawbutton").attr("disabled", "disabled");
 		var divs = Data.read_all_sources(function(ll) {
-			Data.create_pin_markers("#rawmap", ll.splice(0, 100));
+			Data.create_pin_markers("#rawmap", ll);
 			$("#clearraw").attr("disabled", null);
 			$("#clearraw").click(function() {
 				$('#rawmap').gmap3({clear: {}});
