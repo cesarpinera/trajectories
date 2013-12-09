@@ -1,0 +1,78 @@
+<html>
+	<head>
+		<title>Trajectories analysis</title>
+		
+		<script	type="text/javascript" src="js/jquery-1.9.1.js"></script>
+		<script	type="text/javascript" src="js/data.js"></script>
+		<script	type="text/javascript" src="js/trajectories.js"></script>
+		<script	type="text/javascript" src="js/kmeans.js"></script>
+		<script	type="text/javascript" src="js/sources.js"></script>
+
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.5&sensor=false"></script>
+		<script type="text/javascript" src="js/gmap3.js"></script>
+		<script type="text/javascript" src="js/StyledMarker.js"></script>
+
+    </script>
+    
+	</head>
+	<body>
+		<div>
+			<h1>Geolife Trajectories Clustering Analysis</h1>
+			<p><b>Author: </b>Cesar Pinera</p>
+			<p><b>Email: </b>cesar.pinera@pdx.edu</p>
+			<h2>Introduction</h2>
+			<p>This is an exercise on the application of an unsupervised learning algorithm to a real-world problem that I have encountered professionally in the past. For this I have selected a freely available dataset called <a href="http://research.microsoft.com/en-us/downloads/b16d359d-d164-469e-9fd4-daa38f2b2e13/">Geolife Trajectories</a>, which contains <i>trajectories</i> of a almost two hundred volunteers for a span of five years. The resulting dataset contains the coordinates, as obtained by GPS units, that have been taken as samples during the course of those trajectories.</p>
+			<h2>GPS Trajectories</h2>
+			<p>In order to provide computer systems with a personalized and less artificial means of interaction with users, it is necessary to provide them with some manner of <i>context</i> which is relevant to the user, but that it has not been explicitly declared, but <i>learned</i>. This implies that the computer system does not have a complete model of the user <i>a priori</i>, but the model needs to be developed as the interaction proceeds.</p>
+			<p>An important aspect of the user's context is location. People tend to follow patterns which are repeatable subject to prediction - an approximation, by necessity, yet still useful. Yet coordinates are still an abstraction, and in our daily lives rarely do we think in terms of absolute coordinates, bur rather of <i>places</i>. By identifying the actual places that a user tends to visit, we can then add the place itself - not the coordinate, which has an arbitrary resolution - to the context that would be potentially used to further improve the interaction between users and computer systems.</p>
+			<p>Thus the need for an analysis of the coordinates obtained by means of GPS units, which will allow us to project those coordinates to places that are meaningful to people. Further analysis could even attempt to match those coordinates to known places in a database of known <i>Points of Interest (POIs)</i>, so that the attributes of those POIs will also be incorporated into the context of the user, the benefits of which could go as far as to infer intent and other aspects of human behavior.</p>
+			<h2>Coordinate Clustering</h2>
+			<p>The sequences of coordinates that form the trajectories as obtained by GPS units are too raw to be able to match them against POIs or to find patterns that would allow us to infer repeatability. This is due to the resolution of the coordinates themselves: ignoring for the moment the accuracy of each coordinate - and assuming a perfect accuracy every time-, the area of the POI has to be taken into consideration, areas that most likely will not have regular shapes. Thus, it would require an almost perfect database of all the shapes of the POIs on a map to be able to unequivocally match all the coordinates. Such databases are being developed (e.g. Google Maps), yet they focus mostly on public places -commerces, public buildings, attractions, etc.- while leaving behind the sheer majority of private POIs, such as houses. Clearly, we must find an alternate solution that will approximate the identification of POIs due to the lack of a complete POI database.</p>
+			<p>What follows is an experiment on the application of an unsupervised clustering algorithm, <i>viz.</i> k-means, which will reduce the raw coordinates into clusters, with the expectation that the centroids of the clusters can be assumed to be POIs themselves, even if those POIs do not necessarily match an external POI database - yet matching can also be attempted and considered as part of the context when available.</p>
+			<h2>Raw dataset</h2>
+			<p>I have made a selection of one individual in the Geolife Trajectories to visualize her raw trajectories. The decision to show only one person's trajectories is twofold: first, the argument for the repeatability of a person's movements to be applicable to another person is a <i>non sequitur</i> in our current model, and second, the number of coordinates may be overwhelming to current browsers. See an <a href="data/20081023025304.plt"> example of a raw trajectory</a>.</p>
+			<input type="button" id="rawbutton" value="Visualize Raw Coordinates"><i>This process may take several minutes to complete</i><input type="button" id="clearraw" value="Clear">
+			<div id="rawmap"></div>
+			<cite>Raw coordinates for the trajectories of a single subject</cite>
+			<h2>Application of the k-means clustering algorithm</h2>
+			<p>The following is a live computation and rendering of the k-means clustering algorithm on the trajectories for the selected subject. Please bear in mind that the visualization of all the coordinates (over 170,000) on the map is heavy for modern browsers. It is highly recommended to limit the number of coordinates added to the map. However, all the coordinates are used to compute the clusters, regardless of their inclusion on the map.</p>
+			<p>Recommended values:</p>
+			<ul>
+				<li><i>k</i>: 8</li>
+				<li>Coordinates to show: 200</li>
+			</ul>
+			<p>An attempt to match the clusters with known POIs will be made, using Google's lookup. Click on the cluster marker for more information.</p>
+			<form>
+				Number of clusters <i>k</i>: <input id="k" type="text" value="8">
+				Coordinates to show on map (per cluster): <input id="maxcoord" type="text" value="200">
+				<input id="cluster" type="button" value="Cluster">
+				<input id="clearcluster" type="button" value="Clear">
+			</form>
+			<div id="map"></div>
+			<cite>Clustered coordinates. Note the coordinates in the same color as the cluster markers. Click on the markers for POI matching.</cite>
+			<h2>Implementation details</h2>
+			<p>This web page includes the JavaScript code required to analyze, cluster and visualize the trajectories in the dataset, as described above. The code is organized as follows:</p>
+			<ul>
+				<li><p>The k-means clustering algorithm is implemented in <a href="js/kmeans.js">kmeans.js</a>. This is an adaptation of existing work. See the file for the attribution.</p></li>
+				<li><p>The data reading functions (loading and parsing of the Geolife Trajectories dataset) is implemented in <a href="js/data.js">data.js</a>. This is an adaptation of existing work. See the file for the attribution.</p></li>
+				<li><p>The flow of this web page, including event handling, visualization and on-demand data loading is implemented in <a href="js/trajectories.js">trajectories.js</a></p></li>
+				<li><p>An index to the raw datasource files for a single subject, implemented in <a href="js/sources.js">sources.js</a></p></li>
+				<li><p>Additional image files and common JavaScript libraries (e.g. JQuery, GMaps)</p></li>
+			</ul>
+			<h2>Next steps</h2>		
+			<p>Due to time constraints, the scope of this project is limited to the execution and visual analysis of the results of the clustering using the k-means algorithm. Further analysis could include:
+			<ul>
+				<li><p>Automatic determination of the number of clusters <i>k</i>. Work has been done in this space, as in  <a href="http://books.nips.cc/papers/files/nips16/NIPS2003_AA36.pdf">"Learning the k in k-means"</a>, by G. Hamerly and C. Elkan, by means of statistical analysis of Gaussian distribution of the distances between the elements of each cluster and the cluster's centroid.</p></li>
+				<li><p>Application of alternate clustering algorithms, such as <a href="http://en.wikipedia.org/wiki/DBSCAN">Density-based spatial clustering of applications with noise (DBSCAN)</a>, that will be able to better handle noise in the dataset (GPS readings are never perfect) and that would find clusters with arbitrary shapes.</p></li>
+				<li><p>Removing some of the noise in the dataset and limiting the coordinates to a pre-defined area, dropping those that are outside, in order to remove or limit the influence of trajectories that are real but infrequent, such as a trip to a different Country.</p></li>
+			</ul>
+			</p>
+			<h2>Attribution for the Geolife Dataset</h2>
+			<ul>
+			<li><cite>Yu Zheng, Lizhu Zhang, Xing Xie, Wei-Ying Ma. Mining interesting locations and travel sequences from GPS trajectories. In Proceedings of International conference on World Wild Web (WWW 2009), Madrid Spain. ACM Press: 791-800.</cite></li>
+			<li><cite>Yu Zheng, Quannan Li, Yukun Chen, Xing Xie, Wei-Ying Ma. Understanding Mobility Based on GPS Data. In Proceedings of ACM conference on Ubiquitous Computing (UbiComp 2008), Seoul, Korea. ACM Press: 312-321.</cite></li>
+			<li><cite>Yu Zheng, Xing Xie, Wei-Ying Ma, GeoLife: A Collaborative Social Networking Service among User, location and trajectory. Invited paper, in IEEE Data Engineering Bulletin. 33, 2, 2010, pp. 32-40.</cite></li>
+		</div>
+		<div><small><i>Last modified date: 2013-12-06</i></small></div>
+	</body>
+</html>
