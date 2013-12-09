@@ -75,7 +75,6 @@ var Data = {
 									 		    map:map});
 			this.circles.push(styleMarker);
 			google.maps.event.addListener(styleMarker, 'click', function () {
-				console.log("click");
 		        infoWindow.setOptions({
 		            content: poi
 		        });
